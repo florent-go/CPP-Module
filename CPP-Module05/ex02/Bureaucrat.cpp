@@ -1,0 +1,146 @@
+#include "Bureaucrat.hpp"
+#include "Form.hpp"
+
+/*
+**
+** CONSTRUCTEUR
+**
+*/
+
+Bureaucrat::Bureaucrat(void)
+{
+	this->name = "Bob";
+	this->grade = 149;
+}
+
+Bureaucrat::Bureaucrat(std::string const &name, int grade)
+{
+	this->name = name;
+	this->grade = grade;
+	if (this->grade < 1)
+		throw Bureaucrat::GradeTooHighException();
+	if (this->grade > 150)
+		throw Bureaucrat::GradeTooLowException();
+}
+
+Bureaucrat::Bureaucrat(Bureaucrat const &a)
+{
+	this->name = a.name;
+	this->grade = a.grade;
+	if (this->grade < 1)
+		throw Bureaucrat::GradeTooHighException();
+	if (this->grade > 150)
+		throw Bureaucrat::GradeTooLowException();
+}
+
+/*
+**
+** DESTRUCTEUR
+**
+*/
+
+Bureaucrat::~Bureaucrat(void)
+{
+}
+
+/*
+**
+** OPERATEUR
+**
+*/
+
+Bureaucrat & Bureaucrat::operator=(Bureaucrat const &a)
+{
+	this->name = a.name;
+	this->grade = a.grade;
+	return (*this);
+}
+
+std::ostream &operator<<(std::ostream &out, Bureaucrat const &bureaucrat)
+{
+	out << "Bureaucrat " << bureaucrat.getName() << " (Grade " << bureaucrat.getGrade() << ")";
+	return (out);
+}
+
+/*
+**
+** EXCEPTION
+**
+*/
+
+const char *Bureaucrat::GradeTooHighException::what() const throw()
+{
+	return ("BureaucratError: Grade too Hight");
+}
+
+const char *Bureaucrat::GradeTooLowException::what() const throw()
+{
+	return ("BureaucratError: Grade too Low");
+}
+/*
+**
+** FUNCTION
+**
+*/
+
+std::string	const &Bureaucrat::getName(void) const
+{
+	return (this->name);
+}
+
+int	Bureaucrat::getGrade(void) const
+{
+	return (this->grade);
+}
+
+void Bureaucrat::decrementGrade(void)
+{
+	this->grade++;
+	if (this->grade > 150)
+		throw Bureaucrat::GradeTooLowException();
+}
+
+void Bureaucrat::incrementGrade(void)
+{
+	this->grade--;
+	if (this->grade < 1)
+		throw Bureaucrat::GradeTooHighException();
+}
+
+void	Bureaucrat::signForm(Form &form) const
+{
+	if (form.isSigned() == true)
+	{
+		std::cout << *this << " cannot sign " << form
+				<< " because the form is already signed." << std::endl;
+	}
+	else if (form.getSignGrade() < this->grade)
+	{
+		std::cout << *this << " cannot sign " << form
+				<< " because, grade is to low." << std::endl;
+	}
+	else
+	{
+		std::cout << *this << " signs " << form << std::endl;
+		form.beSigned(*this);
+	}
+}
+
+void Bureaucrat::executeForm(Form const &form) const
+{
+	if (!form.isSigned())
+	{
+		std::cout << *this << " cannot execute " << form
+				<< " because the form is unsigned." << std::endl;
+	}
+	else if (form.getExecuteGrade() < this->grade)
+	{
+		std::cout << *this << " cannot execute " << form
+				<< " because, grade is too low." << std::endl;
+	}
+	else
+	{
+		std::cout << *this << " executes " << form << std::endl;
+	}
+	form.execute(*this);
+}
